@@ -22,13 +22,11 @@ function setPartialModel(part, model, layer, model_layer){
 
 async function getPartialModel(){
 
-   const process.cwd()
    const encoder_model = await tf.loadLayersModel('http://localhost:8000/encoder_model/model.json');
    return encoder_model
 }
 
 async function getModel(){
-   const cwd = process.cwd()
    const model = await tf.loadLayersModel('http://localhost:8000/full_model/model.json')
    return model
 }
@@ -36,7 +34,8 @@ async function getModel(){
 
 function prepareData(){
    let t = []
-
+   
+   var set = mnist.set(20,10);
    for (i=0; i < set.training.length; i++){
       t.push(set.training[i].input)
    } 
@@ -44,7 +43,12 @@ function prepareData(){
    return tf.tensor(t).reshape([20,28,28]) 
 }
 
-
+function toObject(arr) {
+  var rv = {};
+  for (var i = 0; i < arr.length; ++i)
+    if (arr[i] !== undefined) rv[i] = arr[i];
+  return rv;
+}
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*") 
@@ -55,14 +59,17 @@ app.use(function(req, res, next) {
 
 app.get('/prediction', function (req, res) {
 
-   var set = mnist.set(20,10);
 
    getModel().then(mod => {
       getPartialModel().then(p_mod=>{
-      p_mod = setPartialModel(p_mod,mod, 1,1)
-      res.send(predict(mod,t))
-      res.end()
-      });
+         p_mod = setPartialModel(p_mod,mod, 1,1)
+         let p = p_mod.predict(prepareData())
+         p.data().then(e =>{ 
+            res.send(e)
+            res.end()
+         })
+
+      })
    })
 
    //request('http://10.42.0.130:8080/?action=snapshot',{encoding:'binary'},  (err,resp,body)=>{

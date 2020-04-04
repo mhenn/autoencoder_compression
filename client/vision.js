@@ -40,6 +40,8 @@ function test(){
    xhr.onreadystatechange = function() {
       if (xhr.readyState == XMLHttpRequest.DONE) {
          alert(xhr.responseText);
+         console.log(tf.tensor(xhr.responseText));
+         console.log(JSON.parse(xhr.responseText));
       }
    }
    xhr.open('GET', 'http://localhost:3000/prediction', true);
