@@ -63,12 +63,10 @@ app.get('/prediction', function (req, res) {
    getModel().then(mod => {
       getPartialModel().then(p_mod=>{
          p_mod = setPartialModel(p_mod,mod, 1,1)
-         let p = p_mod.predict(prepareData())
-         p.data().then(e =>{ 
+         p_mod.predict(prepareData()).data().then(e =>{
             res.send(e)
             res.end()
          })
-
       })
    })
 
